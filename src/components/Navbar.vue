@@ -4,8 +4,8 @@
             <img :src="logo" :alt="alt" id="logo">
         </router-link>
 
-        <router-link to="/">INÍCIO</router-link>
-        <router-link to="/favoritos">FAVORITOS</router-link>
+        <router-link to="/" class="link">INÍCIO</router-link>
+        <router-link to="/favoritos" class="link">FAVORITOS</router-link>
     </nav>
 </template>
   
@@ -33,16 +33,17 @@ nav {
     margin-left: 0;
 }
 
-nav a {
+.link {
     color: #000000;
     text-decoration: none;
     margin: 12px;
     transition: .5s;
 }
 
-nav a:hover {
+.link.router-link-active {
     color: red;
 }
+
 
 @media (max-width: 768px) {
 
