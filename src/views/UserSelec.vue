@@ -9,7 +9,7 @@
                         :stars=items.stargazers_count />
                 </li>
             </ul>
-            <button @click="exibemais()" id="pessoa">Ver mais repositórios</button>
+            <button @click="exibemais()">Ver mais repositórios</button>
         </div>
     </div>
 </template>
@@ -31,17 +31,30 @@ export default {
         const data = await reqUserSelec.json();
         const reqUserRepo = await fetch(`https://api.github.com/users/${userSelec}/repos?direction=desc&per_page=4`);
         const dataRepo = await reqUserRepo.json();
-        console.log(dataRepo)
         return {
             data,
-            dataRepo
+            dataRepo,
+            query: userSelec, // add this line to make the query accessible inside the component's methods
         }
     },
     components: {
         RepCard,
         UserProfileCard
+    },
+    methods: {
+        async exibemais() {
+        const page = Math.ceil(this.dataRepo.length / 4) + 1; // calculate next page number
+        try {
+        const response = await fetch(`https://api.github.com/users/${this.query}/repos?page=${page}&per_page=4`);
+        const data = await response.json();
+        this.dataRepo = [...this.dataRepo, ...data]; // append new data to existing list
+    } catch (error) {
+        console.error('Error fetching data:', error);
+  }
+}
     }
 }
+
 </script>
 
 

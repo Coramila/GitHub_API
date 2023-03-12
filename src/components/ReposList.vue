@@ -1,15 +1,13 @@
 <template>
-
   <div class="main-container">
     <ul>
-      <li v-for="repo in repos">
-        <RepCard :id=repo.id :titulo=repo.name :descricao=repo.description :stars=repo.stargazers_count />
+      <li v-for="repo in repos" :key="repo.id">
+        <RepCard :id="repo.id" :titulo="repo.name" :descricao="repo.description" :stars="repo.stargazers_count" />
       </li>
     </ul>
 
-    <button @click="exibemais()" id="pessoa">Ver mais</button>
+    <button v-if="showButton" @click="loadMore">Ver mais</button>
   </div>
-
 </template>
 
 <script>
@@ -18,22 +16,38 @@ import RepCard from './RepCard.vue'
 export default {
   name: 'ReposList',
   props: {
-    query: String,
-  },
-  async setup(props) {
-    const repo = props.query;
-    const reqRepo = await fetch(`https://api.github.com/search/repositories?q=${repo}&per_page=4`);
-    const data = await reqRepo.json();
-    return {
-      repos: data.items,
-    }
+    query: String
   },
   components: {
     RepCard
   },
+  data() {
+    return {
+      repos: [],
+      page: 1,
+      perPage: 4,
+      showButton: false
+    }
+  },
+  async created() {
+    await this.loadRepos()
+  },
   methods: {
-    exibemais() {
-      console.log("fui clicado");
+    async loadRepos() {
+      const res = await fetch(`https://api.github.com/search/repositories?q=${this.query}&per_page=${this.perPage}&page=${this.page}`)
+      const data = await res.json()
+
+      if (data.items.length > 0) {
+        this.repos = [...this.repos, ...data.items]
+        this.showButton = true
+      } else {
+        this.showButton = false
+      }
+    },
+
+    async loadMore() {
+      this.page += 1
+      await this.loadRepos()
     }
   }
 }

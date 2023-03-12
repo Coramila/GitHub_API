@@ -1,16 +1,12 @@
 <template>
-
   <div class="main-container">
     <ul>
-      <li v-for="user in users">
-        <UserCard :name=user.login :bio=user.bio :stars=user.stars :img-url=user.avatar_url />
+      <li v-for="user in users" :key="user.id">
+        <UserCard :name="user.login" :bio="user.bio" :stars="user.stars" :img-url="user.avatar_url" />
       </li>
     </ul>
-    <button @click="exibemais()" id="pessoa">Ver mais</button>
-
+    <button v-if="showButton" @click="loadMore">Ver mais</button>
   </div>
-
-
 </template>
 
 <script>
@@ -19,25 +15,41 @@ import UserCard from './UserCard.vue'
 export default {
   name: 'UsersList',
   props: {
-    query: String,
-  },
-  async setup(props) {
-    const user = props.query;
-    const reqUser = await fetch(`https://api.github.com/search/users?q=${user}&per_page=3`);
-    const data = await reqUser.json();
-    console.log(data.total_count);
-    return { users: data.items }
+    query: String
   },
   components: {
     UserCard
   },
+  data() {
+    return {
+      users: [],
+      page: 1,
+      perPage: 3,
+      showButton: false
+    }
+  },
+  async created() {
+    await this.loadUsers()
+  },
   methods: {
-    exibemais() {
-      console.log("fui clicado");
+    async loadUsers() {
+      const res = await fetch(`https://api.github.com/search/users?q=${this.query}&per_page=${this.perPage}&page=${this.page}`)
+      const data = await res.json()
+
+      if (data.items.length > 0) {
+        this.users = [...this.users, ...data.items]
+        this.showButton = true
+      } else {
+        this.showButton = false
+      }
+    },
+
+    async loadMore() {
+      this.page += 1
+      await this.loadUsers()
     }
   }
 }
-
 </script>
 
 <style scoped>
