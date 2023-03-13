@@ -1,11 +1,10 @@
 <template>
-
     <div class="main-container-repo">
         <div class="container-repo-info">
             <div class="titulo-star">
                 <h2>{{ titulo }}</h2>
                 <button @click="manipularFavorito()">
-                    <img src="/img/blackstar.png" alt="Logo GitHub" class="black-star">
+                    <img :src="isFavorito ? '/img/yellowstar.png' : '/img/blackstar.png'" alt="Logo GitHub" class="star">
                 </button>
             </div>
             <p>{{ descricao }}</p>
@@ -16,8 +15,6 @@
             </div>
         </div>
     </div>
-
-
 </template>
 
 <script>
@@ -31,6 +28,11 @@ export default {
         stars: Number,
         id: Number
     },
+    data() {
+        return {
+            isFavorito: false
+        }
+    },
     methods: {
         manipularFavorito() {
             const repo = {
@@ -40,6 +42,7 @@ export default {
                 id: this.id
             }
             this.favoritar(repo)
+            this.isFavorito = !this.isFavorito
         }
     },
     setup() {
